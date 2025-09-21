@@ -68,35 +68,65 @@ Esta aplicação está configurada para deploy na Vercel com as seguintes caract
 7. **Acesse o sistema**
    - Navegue para: `http://localhost:4321`
 
-## 🌐 Deploy na Vercel
+## 🌐 Deploy na Vercel com Vercel Postgres
 
 ### Pré-requisitos
 1. Conta na [Vercel](https://vercel.com)
-2. Banco PostgreSQL em produção (recomendações):
-   - [Neon](https://neon.tech/) - Gratuito e integrado com Vercel
-   - [Vercel Postgres](https://vercel.com/storage/postgres)
-   - [Supabase](https://supabase.com/)
-   - [Railway](https://railway.app/)
+2. Projeto conectado ao GitHub na Vercel
 
-### Passos para Deploy
-1. **Fork/Clone este repositório**
-2. **Importe o projeto na Vercel** via GitHub
-3. **Configure as variáveis de ambiente:**
-   ```
-   DATABASE_URL=postgresql://user:pass@host/db?sslmode=require
-   DIRECT_URL=postgresql://user:pass@host/db?sslmode=require  
-   JWT_SECRET=your-super-secret-jwt-key
-   ```
-4. **Execute as migrações** (primeira vez):
-   ```bash
-   npx prisma migrate deploy
-   ```
-5. **Deploy automático** será feito a cada push
+### Passos para Deploy com Vercel Postgres
 
-### Variáveis de Ambiente Necessárias
-Copie o arquivo `.env.example` e configure:
-- `DATABASE_URL` - String de conexão do PostgreSQL
-- `DIRECT_URL` - String de conexão direta (opcional)
+#### 1. **Configure o Vercel Postgres**
+1. Acesse [Vercel Dashboard](https://vercel.com/dashboard)
+2. Vá para **Storage** > **Create Database** > **Postgres**
+3. Escolha um nome para seu banco (ex: `todolist-db`)
+4. Selecione a região mais próxima
+5. Clique em **Create**
+
+#### 2. **Conecte o banco ao seu projeto**
+1. No dashboard do banco criado, vá até a aba **Settings**
+2. Em **Connect Project**, selecione seu projeto `todo-list-astro`
+3. As variáveis de ambiente serão automaticamente adicionadas ao projeto
+
+#### 3. **Execute as migrações**
+No terminal da Vercel ou localmente com as variáveis do Vercel:
+```bash
+npx prisma migrate deploy
+```
+
+#### 4. **Configure JWT_SECRET**
+1. Vá para **Settings** > **Environment Variables** no seu projeto Vercel
+2. Adicione: `JWT_SECRET` com um valor seguro (ex: string aleatória de 64 caracteres)
+
+#### 5. **Deploy automático**
+O deploy será feito automaticamente a cada push para o GitHub.
+
+### Script de Setup Automático
+Execute após conectar o Vercel Postgres:
+```bash
+# Torna executável
+chmod +x scripts/setup-vercel-postgres.sh
+
+# Executa setup
+./scripts/setup-vercel-postgres.sh
+```
+
+Ou use o utilitário TypeScript:
+```bash
+npx tsx scripts/setup-vercel-postgres.ts
+```
+
+### Variáveis de Ambiente (Automáticas)
+O Vercel Postgres configura automaticamente:
+- `POSTGRES_URL` - URL completa de conexão
+- `POSTGRES_PRISMA_URL` - URL com connection pooling (otimizada para Prisma)
+- `POSTGRES_URL_NON_POOLING` - URL de conexão direta
+- `POSTGRES_USER` - Usuário do banco
+- `POSTGRES_HOST` - Host do banco
+- `POSTGRES_PASSWORD` - Senha do banco
+- `POSTGRES_DATABASE` - Nome do banco
+
+**Você só precisa configurar manualmente:**
 - `JWT_SECRET` - Chave secreta para JWT
 
 ## 👤 Usuários de Teste
