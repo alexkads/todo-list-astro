@@ -33,3 +33,4 @@ pnpm-debug.log*
 # Database
 *.db
 *.db-journal
+.vercel
