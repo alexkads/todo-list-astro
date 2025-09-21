@@ -1,0 +1,445 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Dashboard - Todo List">
+  <div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-6">
+          <div class="flex items-center">
+            <h1 class="text-3xl font-bold text-gray-900">Minhas Tarefas</h1>
+          </div>
+          <div class="flex items-center space-x-4">
+            <span id="user-name" class="text-gray-700"></span>
+            <button
+              id="logout-btn"
+              class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+            >
+              Sair
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <!-- Formulário para nova tarefa -->
+      <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-4">Nova Tarefa</h2>
+        <form id="todo-form" class="space-y-4">
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label for="title" class="block text-sm font-medium text-gray-700">Título *</label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                required
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                placeholder="Digite o título da tarefa"
+              />
+            </div>
+            <div>
+              <label for="priority" class="block text-sm font-medium text-gray-700">Prioridade</label>
+              <select
+                id="priority"
+                name="priority"
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              >
+                <option value="LOW">Baixa</option>
+                <option value="MEDIUM" selected>Média</option>
+                <option value="HIGH">Alta</option>
+                <option value="URGENT">Urgente</option>
+              </select>
+            </div>
+          </div>
+          
+          <div>
+            <label for="description" class="block text-sm font-medium text-gray-700">Descrição</label>
+            <textarea
+              id="description"
+              name="description"
+              rows="3"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              placeholder="Descrição opcional da tarefa"
+            ></textarea>
+          </div>
+          
+          <div>
+            <label for="dueDate" class="block text-sm font-medium text-gray-700">Data de vencimento</label>
+            <input
+              type="date"
+              id="dueDate"
+              name="dueDate"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+          </div>
+          
+          <div class="flex justify-end">
+            <button
+              type="submit"
+              id="add-todo-btn"
+              class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+            >
+              Adicionar Tarefa
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Lista de tarefas -->
+      <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-lg font-medium text-gray-900">Lista de Tarefas</h2>
+        </div>
+        <div id="todos-container" class="divide-y divide-gray-200">
+          <!-- As tarefas serão inseridas aqui dinamicamente -->
+        </div>
+        <div id="no-todos" class="hidden p-6 text-center text-gray-500">
+          Nenhuma tarefa encontrada. Crie sua primeira tarefa acima!
+        </div>
+        <div id="loading" class="p-6 text-center text-gray-500">
+          Carregando tarefas...
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal para editar tarefa -->
+  <div id="edit-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+      <div class="mt-3">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Editar Tarefa</h3>
+        <form id="edit-form" class="space-y-4">
+          <input type="hidden" id="edit-id" />
+          <div>
+            <label for="edit-title" class="block text-sm font-medium text-gray-700">Título *</label>
+            <input
+              type="text"
+              id="edit-title"
+              required
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+          </div>
+          <div>
+            <label for="edit-priority" class="block text-sm font-medium text-gray-700">Prioridade</label>
+            <select
+              id="edit-priority"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            >
+              <option value="LOW">Baixa</option>
+              <option value="MEDIUM">Média</option>
+              <option value="HIGH">Alta</option>
+              <option value="URGENT">Urgente</option>
+            </select>
+          </div>
+          <div>
+            <label for="edit-description" class="block text-sm font-medium text-gray-700">Descrição</label>
+            <textarea
+              id="edit-description"
+              rows="3"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            ></textarea>
+          </div>
+          <div>
+            <label for="edit-dueDate" class="block text-sm font-medium text-gray-700">Data de vencimento</label>
+            <input
+              type="date"
+              id="edit-dueDate"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+          </div>
+          <div class="flex justify-end space-x-3">
+            <button
+              type="button"
+              id="cancel-edit-btn"
+              class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md text-sm font-medium"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              id="save-edit-btn"
+              class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+            >
+              Salvar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    interface Todo {
+      id: string;
+      title: string;
+      description: string | null;
+      completed: boolean;
+      priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+      dueDate: string | null;
+      createdAt: string;
+      updatedAt: string;
+    }
+
+    interface User {
+      id: string;
+      name: string;
+      email: string;
+      role: string;
+    }
+
+    let todos: Todo[] = [];
+
+    // Elementos do DOM
+    const userNameSpan = document.getElementById('user-name') as HTMLSpanElement;
+    const logoutBtn = document.getElementById('logout-btn') as HTMLButtonElement;
+    const todoForm = document.getElementById('todo-form') as HTMLFormElement;
+    const todosContainer = document.getElementById('todos-container') as HTMLDivElement;
+    const noTodosDiv = document.getElementById('no-todos') as HTMLDivElement;
+    const loadingDiv = document.getElementById('loading') as HTMLDivElement;
+    const editModal = document.getElementById('edit-modal') as HTMLDivElement;
+    const editForm = document.getElementById('edit-form') as HTMLFormElement;
+    const cancelEditBtn = document.getElementById('cancel-edit-btn') as HTMLButtonElement;
+
+    // Verificar autenticação e carregar dados do usuário
+    async function checkAuth() {
+      try {
+        const response = await fetch('/api/auth/me');
+        if (!response.ok) {
+          window.location.href = '/login';
+          return;
+        }
+        const data = await response.json();
+        userNameSpan.textContent = data.user.name;
+      } catch (error) {
+        window.location.href = '/login';
+      }
+    }
+
+    // Carregar tarefas
+    async function loadTodos() {
+      try {
+        const response = await fetch('/api/todos');
+        if (!response.ok) {
+          throw new Error('Erro ao carregar tarefas');
+        }
+        const data = await response.json();
+        todos = data.todos;
+        renderTodos();
+      } catch (error) {
+        console.error('Erro ao carregar tarefas:', error);
+      } finally {
+        loadingDiv.classList.add('hidden');
+      }
+    }
+
+    // Renderizar tarefas
+    function renderTodos() {
+      todosContainer.innerHTML = '';
+      
+      if (todos.length === 0) {
+        noTodosDiv.classList.remove('hidden');
+        return;
+      }
+      
+      noTodosDiv.classList.add('hidden');
+      
+      todos.forEach(todo => {
+        const todoElement = createTodoElement(todo);
+        todosContainer.appendChild(todoElement);
+      });
+    }
+
+    // Criar elemento de tarefa
+    function createTodoElement(todo: Todo): HTMLElement {
+      const div = document.createElement('div');
+      div.className = 'p-6';
+      
+      const priorityColors = {
+        LOW: 'bg-gray-100 text-gray-800',
+        MEDIUM: 'bg-blue-100 text-blue-800',
+        HIGH: 'bg-yellow-100 text-yellow-800',
+        URGENT: 'bg-red-100 text-red-800'
+      };
+      
+      const priorityLabels = {
+        LOW: 'Baixa',
+        MEDIUM: 'Média',
+        HIGH: 'Alta',
+        URGENT: 'Urgente'
+      };
+
+      const dueDateHtml = todo.dueDate 
+        ? `<span class="text-sm text-gray-500">Vence em: ${new Date(todo.dueDate).toLocaleDateString('pt-BR')}</span>`
+        : '';
+
+      div.innerHTML = `
+        <div class="flex items-center justify-between">
+          <div class="flex-1">
+            <div class="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                ${todo.completed ? 'checked' : ''}
+                onchange="toggleTodo('${todo.id}', this.checked)"
+                class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              />
+              <div class="flex-1">
+                <h3 class="text-sm font-medium text-gray-900 ${todo.completed ? 'line-through' : ''}">${todo.title}</h3>
+                ${todo.description ? `<p class="text-sm text-gray-500 mt-1">${todo.description}</p>` : ''}
+                ${dueDateHtml}
+              </div>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${priorityColors[todo.priority]}">
+                ${priorityLabels[todo.priority]}
+              </span>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2 ml-4">
+            <button
+              onclick="editTodo('${todo.id}')"
+              class="text-indigo-600 hover:text-indigo-900 text-sm font-medium"
+            >
+              Editar
+            </button>
+            <button
+              onclick="deleteTodo('${todo.id}')"
+              class="text-red-600 hover:text-red-900 text-sm font-medium"
+            >
+              Excluir
+            </button>
+          </div>
+        </div>
+      `;
+      
+      return div;
+    }
+
+    // Adicionar nova tarefa
+    todoForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(todoForm);
+      const data = {
+        title: formData.get('title') as string,
+        description: formData.get('description') as string || null,
+        priority: formData.get('priority') as string,
+        dueDate: formData.get('dueDate') as string || null
+      };
+
+      try {
+        const response = await fetch('/api/todos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+          todoForm.reset();
+          loadTodos();
+        }
+      } catch (error) {
+        console.error('Erro ao adicionar tarefa:', error);
+      }
+    });
+
+    // Funções globais para os botões
+    window.toggleTodo = async (id: string, completed: boolean) => {
+      try {
+        const response = await fetch(`/api/todos/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ completed })
+        });
+
+        if (response.ok) {
+          loadTodos();
+        }
+      } catch (error) {
+        console.error('Erro ao atualizar tarefa:', error);
+      }
+    };
+
+    window.editTodo = (id: string) => {
+      const todo = todos.find(t => t.id === id);
+      if (!todo) return;
+
+      (document.getElementById('edit-id') as HTMLInputElement).value = todo.id;
+      (document.getElementById('edit-title') as HTMLInputElement).value = todo.title;
+      (document.getElementById('edit-priority') as HTMLSelectElement).value = todo.priority;
+      (document.getElementById('edit-description') as HTMLTextAreaElement).value = todo.description || '';
+      (document.getElementById('edit-dueDate') as HTMLInputElement).value = todo.dueDate ? todo.dueDate.split('T')[0] : '';
+
+      editModal.classList.remove('hidden');
+    };
+
+    window.deleteTodo = async (id: string) => {
+      if (!confirm('Tem certeza que deseja excluir esta tarefa?')) return;
+
+      try {
+        const response = await fetch(`/api/todos/${id}`, { method: 'DELETE' });
+        if (response.ok) {
+          loadTodos();
+        }
+      } catch (error) {
+        console.error('Erro ao excluir tarefa:', error);
+      }
+    };
+
+    // Editar tarefa
+    editForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const id = (document.getElementById('edit-id') as HTMLInputElement).value;
+      const data = {
+        title: (document.getElementById('edit-title') as HTMLInputElement).value,
+        description: (document.getElementById('edit-description') as HTMLTextAreaElement).value || null,
+        priority: (document.getElementById('edit-priority') as HTMLSelectElement).value,
+        dueDate: (document.getElementById('edit-dueDate') as HTMLInputElement).value || null
+      };
+
+      try {
+        const response = await fetch(`/api/todos/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+          editModal.classList.add('hidden');
+          loadTodos();
+        }
+      } catch (error) {
+        console.error('Erro ao editar tarefa:', error);
+      }
+    });
+
+    // Cancelar edição
+    cancelEditBtn.addEventListener('click', () => {
+      editModal.classList.add('hidden');
+    });
+
+    // Logout
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        await fetch('/api/auth/logout', { method: 'POST' });
+        window.location.href = '/login';
+      } catch (error) {
+        console.error('Erro no logout:', error);
+        window.location.href = '/login';
+      }
+    });
+
+    // Fechar modal ao clicar fora
+    editModal.addEventListener('click', (e) => {
+      if (e.target === editModal) {
+        editModal.classList.add('hidden');
+      }
+    });
+
+    // Inicializar aplicação
+    checkAuth();
+    loadTodos();
+  </script>
+</Layout>

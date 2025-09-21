@@ -1,0 +1,158 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Cadastro - Todo List">
+  <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+      <div>
+        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          Criar nova conta
+        </h2>
+        <p class="mt-2 text-center text-sm text-gray-600">
+          Ou
+          <a href="/login" class="font-medium text-indigo-600 hover:text-indigo-500">
+            entre na sua conta existente
+          </a>
+        </p>
+      </div>
+      
+      <form id="register-form" class="mt-8 space-y-6">
+        <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded"></div>
+        <div id="success-message" class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded"></div>
+        
+        <div class="space-y-4">
+          <div>
+            <label for="name" class="block text-sm font-medium text-gray-700">Nome completo</label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              required
+              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              placeholder="Seu nome completo"
+            />
+          </div>
+          
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              placeholder="seu@email.com"
+            />
+          </div>
+          
+          <div>
+            <label for="password" class="block text-sm font-medium text-gray-700">Senha</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              minlength="6"
+              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              placeholder="Mínimo 6 caracteres"
+            />
+          </div>
+          
+          <div>
+            <label for="confirmPassword" class="block text-sm font-medium text-gray-700">Confirmar senha</label>
+            <input
+              id="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              required
+              minlength="6"
+              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              placeholder="Confirme sua senha"
+            />
+          </div>
+        </div>
+
+        <div>
+          <button
+            type="submit"
+            id="submit-btn"
+            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+          >
+            Criar conta
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('register-form') as HTMLFormElement;
+    const errorDiv = document.getElementById('error-message') as HTMLDivElement;
+    const successDiv = document.getElementById('success-message') as HTMLDivElement;
+    const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+
+    function showError(message: string) {
+      errorDiv.textContent = message;
+      errorDiv.classList.remove('hidden');
+      successDiv.classList.add('hidden');
+    }
+
+    function showSuccess(message: string) {
+      successDiv.textContent = message;
+      successDiv.classList.remove('hidden');
+      errorDiv.classList.add('hidden');
+    }
+
+    function hideMessages() {
+      errorDiv.classList.add('hidden');
+      successDiv.classList.add('hidden');
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideMessages();
+
+      const formData = new FormData(form);
+      const name = formData.get('name') as string;
+      const email = formData.get('email') as string;
+      const password = formData.get('password') as string;
+      const confirmPassword = formData.get('confirmPassword') as string;
+
+      // Validar se as senhas coincidem
+      if (password !== confirmPassword) {
+        showError('As senhas não coincidem');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Criando conta...';
+
+      try {
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name, email, password }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          showSuccess('Conta criada com sucesso! Redirecionando...');
+          setTimeout(() => {
+            window.location.href = '/dashboard';
+          }, 2000);
+        } else {
+          showError(data.error || 'Erro no cadastro');
+        }
+      } catch (error) {
+        showError('Erro de conexão');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Criar conta';
+      }
+    });
+  </script>
+</Layout>

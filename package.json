@@ -1,0 +1,30 @@
+{
+  "name": "todo-list-filippi",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "db:seed": "npx tsx src/scripts/seed.ts",
+    "db:studio": "npx prisma studio"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.16.2",
+    "@tailwindcss/vite": "^4.1.13",
+    "@types/bcrypt": "^6.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "astro": "^5.13.9",
+    "bcrypt": "^6.0.0",
+    "cookie": "^1.0.2",
+    "jsonwebtoken": "^9.0.2",
+    "nanoid": "^5.1.5",
+    "tailwindcss": "^4.1.13"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "prisma": "^6.16.2",
+    "tsx": "^4.20.5"
+  }
+}
