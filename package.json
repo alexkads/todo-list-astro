@@ -4,13 +4,17 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "prisma generate && astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "postinstall": "prisma generate",
     "db:seed": "npx tsx src/scripts/seed.ts",
-    "db:studio": "npx prisma studio"
+    "db:studio": "npx prisma studio",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:push": "prisma db push"
   },
   "dependencies": {
+    "@astrojs/vercel": "^8.2.7",
     "@prisma/client": "^6.16.2",
     "@tailwindcss/vite": "^4.1.13",
     "@types/bcrypt": "^6.0.0",

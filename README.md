@@ -1,6 +1,14 @@
 # 📝 Sistema de Lista de Tarefas
 
-Um sistema completo de gerenciamento de tarefas desenvolvido com **AstroJS**, **Prisma ORM**, **SQLite** e sistema completo de autenticação e autorização.
+Um sistema completo de gerenciamento de tarefas desenvolvido com **AstroJS**, **Prisma ORM**, **PostgreSQL** e sistema completo de autenticação e autorização.
+
+## 🌐 Deploy na Vercel
+
+Esta aplicação está configurada para deploy na Vercel com as seguintes características:
+- ✅ **Adapter Vercel Serverless** configurado
+- ✅ **PostgreSQL** otimizado para produção
+- ✅ **Variáveis de ambiente** documentadas
+- ✅ **Build scripts** otimizados
 
 ## 🚀 Características
 
@@ -10,17 +18,19 @@ Um sistema completo de gerenciamento de tarefas desenvolvido com **AstroJS**, **
 - 🎨 **Interface moderna** com Tailwind CSS
 - 🔒 **Middleware de proteção** de rotas
 - 📱 **Design responsivo**
-- 🗄️ **Banco SQLite** com Prisma ORM
+- 🗄️ **Banco PostgreSQL** com Prisma ORM
+- 🚀 **Deploy na Vercel** otimizado
 
 ## 🛠️ Tecnologias Utilizadas
 
 - **AstroJS** - Framework web moderno
 - **TypeScript** - Tipagem estática
 - **Prisma ORM** - Object-Relational Mapping
-- **SQLite** - Banco de dados
+- **PostgreSQL** - Banco de dados
 - **Tailwind CSS** - Framework CSS
 - **JWT** - Autenticação via tokens
 - **bcrypt** - Criptografia de senhas
+- **Vercel** - Plataforma de deploy
 
 ## 📦 Instalação
 
@@ -34,24 +44,60 @@ Um sistema completo de gerenciamento de tarefas desenvolvido com **AstroJS**, **
    npm install
    ```
 
-3. **Configure o banco de dados**
+3. **Inicie o PostgreSQL (desenvolvimento local)**
+   ```bash
+   docker compose up -d
+   ```
+
+4. **Configure o banco de dados**
    ```bash
    npx prisma generate
    npx prisma migrate dev --name init
    ```
 
-4. **Execute o seed para criar usuários de teste**
+5. **Execute o seed para criar usuários de teste**
    ```bash
    npm run db:seed
    ```
 
-5. **Inicie o servidor de desenvolvimento**
+6. **Inicie o servidor de desenvolvimento**
    ```bash
    npm run dev
    ```
 
-6. **Acesse o sistema**
+7. **Acesse o sistema**
    - Navegue para: `http://localhost:4321`
+
+## 🌐 Deploy na Vercel
+
+### Pré-requisitos
+1. Conta na [Vercel](https://vercel.com)
+2. Banco PostgreSQL em produção (recomendações):
+   - [Neon](https://neon.tech/) - Gratuito e integrado com Vercel
+   - [Vercel Postgres](https://vercel.com/storage/postgres)
+   - [Supabase](https://supabase.com/)
+   - [Railway](https://railway.app/)
+
+### Passos para Deploy
+1. **Fork/Clone este repositório**
+2. **Importe o projeto na Vercel** via GitHub
+3. **Configure as variáveis de ambiente:**
+   ```
+   DATABASE_URL=postgresql://user:pass@host/db?sslmode=require
+   DIRECT_URL=postgresql://user:pass@host/db?sslmode=require  
+   JWT_SECRET=your-super-secret-jwt-key
+   ```
+4. **Execute as migrações** (primeira vez):
+   ```bash
+   npx prisma migrate deploy
+   ```
+5. **Deploy automático** será feito a cada push
+
+### Variáveis de Ambiente Necessárias
+Copie o arquivo `.env.example` e configure:
+- `DATABASE_URL` - String de conexão do PostgreSQL
+- `DIRECT_URL` - String de conexão direta (opcional)
+- `JWT_SECRET` - Chave secreta para JWT
 
 ## 👤 Usuários de Teste
 
