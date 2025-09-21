@@ -1,0 +1,43 @@
+name: todolist-local
+services:
+  postgres:
+    image: postgres:16.1
+    container_name: postgres
+    restart: always
+    volumes:
+      - postgres-data-local:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgresql
+      - POSTGRES_PASSWORD=postgresql
+      - POSTGRES_DB=todolistdb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5434:5432"
+    networks:
+      - todolist-network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@todolist.com
+      - PGADMIN_DEFAULT_PASSWORD=admin123
+    ports:
+      - "5050:80"
+    networks:
+      - todolist-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+networks:
+  todolist-network:
+    driver: bridge
+
+volumes:
+  postgres-data-local:
